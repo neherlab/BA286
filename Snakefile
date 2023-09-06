@@ -81,17 +81,36 @@ rule filter_21L_sequences:
         """
 
 
-rule filter_BA286:
+rule unpack_BA286:
+    """
+    Need to download the tarball from GISAID and place it in the data directory.
+    """
     input:
-        metadata="builds/metadata_21L.tsv.zst",
+        tarball="data/gisaid.tar",
     output:
         metadata="builds/metadata_BA286_raw.tsv",
+        sequences="builds/sequences_BA286.fasta",
     shell:
         """
-        zstdcat {input} \
-        | tsv-filter -H --str-in-fld Nextclade_pango:"BA.2.86" \
-        >{output.metadata}
+        mkdir -p builds/tmp
+        tar -xvf {input.tarball} -C builds/tmp
+        mv builds/tmp/*.metadata.tsv {output.metadata}
+        mv builds/tmp/*.fasta {output.sequences}
+        rm -rf builds/tmp
         """
+
+
+# rule filter_BA286:
+#     input:
+#         metadata="builds/metadata_21L.tsv.zst",
+#     output:
+#         metadata="builds/metadata_BA286_raw.tsv",
+#     shell:
+#         """
+#         zstdcat {input} \
+#         | tsv-filter -H --str-in-fld Nextclade_pango:"BA.2.86" \
+#         >{output.metadata}
+#         """
 
 
 rule postprocess_dates:
@@ -182,9 +201,16 @@ rule collect_metadata:
     output:
         metadata="builds/metadata_sample.tsv",
         strains="builds/strains_sample.txt",
+    params:
+        fields="strain,gisaid_epi_isl,date,region,country,division,location,host,age,sex,originating_lab,submitting_lab,authors,url,title,paper_url,date_submitted",
     shell:
         """
-        tsv-append -H {input} >{output.metadata}
+        rm -rf builds/tmpcollect
+        mkdir -p builds/tmpcollect
+        for file in {input}; do
+            tsv-select -H -f {params.fields} $file >builds/tmpcollect/$(basename $file)
+        done
+        tsv-append -H builds/tmpcollect/*.tsv >{output.metadata}
         tsv-select -H -f strain {output.metadata} >{output.strains}
         """
 
@@ -194,6 +220,7 @@ rule collect_sequences:
         sequences="builds/sequences_21L.fasta.zst",
         strain_names="builds/strains_sample.txt",
         consensus_sequences="config/consensus_sequences.fasta",
+        BA286="builds/sequences_BA286.fasta",
     output:
         sequences="builds/sequences_sample.fasta",
     shell:
@@ -201,7 +228,7 @@ rule collect_sequences:
         mkdir -p builds/tmp
         zstdcat {input.sequences} \
         | seqkit grep -f {input.strain_names} >builds/tmp/seq.fasta
-        seqkit seq -w 0 builds/tmp/seq.fasta {input.consensus_sequences} >{output.sequences}
+        seqkit seq -w 0 builds/tmp/seq.fasta {input.consensus_sequences} {input.BA286} >{output.sequences}
         rm builds/tmp/seq.fasta
         """
 
@@ -243,7 +270,7 @@ rule exclude_outliers:
 
 rule nextalign_before_mask:
     input:
-        fasta="builds/sequences_sample.fasta",
+        fasta="builds/sequences.fasta",
         dataset=rules.download_nextclade_dataset.output,
     output:
         alignment="builds/premask.fasta",

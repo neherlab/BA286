@@ -1,1 +1,6 @@
-nothing
+hCoV-19/env/Thailand/CU-064/2023
+hCoV-19/env/Thailand/CU-072/2023
+hCoV-19/env/Thailand/CU-074/2023
+hCoV-19/env/Thailand/CU-077/2023
+hCoV-19/env/Thailand/CU-082/2023
+hCoV-19/Israel/SMC-7114868/2023
