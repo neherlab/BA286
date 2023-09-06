@@ -5,3 +5,4 @@ data/
 *.tar
 deploy/*
 .DS_Store
+figures/

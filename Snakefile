@@ -464,6 +464,25 @@ rule export:
         """
 
 
+rule create_figure:
+    input:
+        metadata="builds/metadata.tsv",
+        tree="builds/tree.nwk",
+        alignment="builds/aligned.fasta",
+    output:
+        figure="figures/timetree.pdf",
+        auspice_json="auspice/tt.json",
+    shell:
+        """
+        python3 scripts/timetree_inference.py \
+            --metadata {input.metadata} \
+            --tree {input.tree} \
+            --alignment {input.alignment} \
+            --figure {output.figure} \
+            --auspice {output.auspice_json}
+        """
+
+
 # rule deploy_single:
 #     input:
 #         "auspice/ncov_{build}.json",
