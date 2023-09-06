@@ -393,7 +393,7 @@ rule ancestral:
             --alignment {input.alignment} \
             --output-node-data {output.node_data} \
             --inference {params.inference} \
-            --genes "N" "ORF1a" "ORF8" "S" "ORF7a" "ORF1b" \
+            --genes E M N ORF1a ORF1b ORF3a ORF6 ORF7a ORF7b ORF8 ORF9b S \
             --annotation {input.annotation} \
             --translations {params.translations} \
             2>&1 | tee {log}
