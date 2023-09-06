@@ -1,0 +1,7 @@
+.snakemake/*
+builds/*
+auspice/*
+data/
+*.tar
+deploy/*
+.DS_Store
