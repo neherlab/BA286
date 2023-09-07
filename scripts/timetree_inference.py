@@ -7,9 +7,22 @@ from treetime import TreeTime
 from treetime.CLI_io import create_auspice_json
 from treetime.utils import parse_dates
 
-def main(args):
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--metadata', default='builds/metadata.tsv')
+    parser.add_argument('--tree', default='builds/tree.nwk')
+    parser.add_argument('--alignment', default='builds/aligned.fasta')
+    parser.add_argument('--figure', default='figures/timetree.pdf')
+    parser.add_argument('--auspice', default='auspice/tt.json')
+    args = parser.parse_args()
+
     dates = parse_dates(args.metadata)
     d = pd.read_csv(args.metadata, sep='\t', index_col=0)
+    d.region[d.region=='Africa'] = 'Other Africa'
+    d.region[(d.country=='South Africa') | (d.country=='Eswatini') | (d.country=='Namibia')] = 'Southern Africa'
+
     # for ri, row in d.iterrows():
     #     if ':' in row['treetime_date']:
     #         dates[ri] = [float(x) for x in row['treetime_date'].split(':')]
@@ -45,13 +58,7 @@ def main(args):
     from treetime.utils import datestring_from_numeric
 
     def tip_labels(x):
-        if x.is_terminal():
-            if len(x.name)<10:
-                return x.name
-            else:
-                return d.loc[x.name, 'country']
-        else:
-            return ''
+        return ''
 
     def branch_labels(x):
         if x==long_branch:
@@ -61,8 +68,32 @@ def main(args):
 
     fig = plt.figure(figsize=(7,5))
     ax = fig.add_axes(111)
-    plot_vs_years(tt, confidence=[0.05, 0.95], step=1/12, label_func=tip_labels, ax=ax, branch_labels=branch_labels)
+    from matplotlib.colors import to_hex
+    region_colors = {r:to_hex(f'C{i}') for i,r in enumerate(d.region.unique())}
 
+    for y,n in enumerate(tt.tree.get_terminals()):
+        n.y = y
+        n.color='#888888'
+        #n.color = region_colors[d.loc[n.name, 'region']]
+
+    for n in tt.tree.get_nonterminals():
+        n.color='#888888'
+
+    plot_vs_years(tt, confidence=[0.05, 0.95], step=1/12, label_func=tip_labels, ax=ax,
+                  branch_labels=branch_labels, selective_confidence= lambda x: x==long_branch)
+
+    tt.tree.root.x = tt.tree.root.branch_length
+    for n in tt.tree.get_nonterminals(order='preorder'):
+        for c in n:
+            c.x = n.x + c.branch_length
+
+
+    for region in sorted(region_colors.keys()):
+        if region=='?': continue
+        tips = [n for n in tt.tree.get_terminals() if d.loc[n.name, 'region']==region]
+        plt.scatter([n.x for n in tips],  [n.y for n in tips], c=region_colors[region], label=region, zorder=2)
+
+    plt.legend()
     tick_labels = []
     tick_positions = []
     for p, x in zip(plt.xticks()[0][::2], plt.xticks()[1][::2]):
@@ -81,14 +112,3 @@ def main(args):
     ax.spines['left'].set_visible(False)
 
     plt.savefig(args.figure)
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--metadata', default='builds/metadata.tsv')
-    parser.add_argument('--tree', default='builds/tree.nwk')
-    parser.add_argument('--alignment', default='builds/aligned.fasta')
-    parser.add_argument('--figure', default='figures/timetree.pdf')
-    parser.add_argument('--auspice', default='auspice/tt.json')
-    args = parser.parse_args()
-    
-    main(args)
