@@ -17,7 +17,6 @@ if __name__ == '__main__':
     parser.add_argument('--output-node-data')
     parser.add_argument('--alignment', default='builds/aligned.fasta')
     parser.add_argument('--figure', default='figures/timetree.pdf')
-    parser.add_argument('--auspice', default='auspice/tt.json')
     args = parser.parse_args()
 
     dates = parse_dates(args.metadata)
@@ -50,11 +49,6 @@ if __name__ == '__main__':
         clock_rate = 0.0005, vary_rate=0.0002, time_marginal='assign')
 
     tt.tree.prune(tt.tree.find_any("BA.2"))
-    auspice = create_auspice_json(tt, timetree=True, confidence=True, seq_info=True)
-
-    with open(args.auspice, 'w') as fh:
-        import json
-        json.dump(auspice, fh, indent=2)
 
     if args.output_tree:
         Phylo.write(tt.tree, args.output_tree, 'newick')

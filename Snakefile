@@ -1,4 +1,5 @@
 regions = ["Europe", "America", "Oceania", "Asia", "Africa"]
+use_frozen_background = True
 
 
 rule build:
@@ -100,6 +101,22 @@ rule unpack_BA286:
         """
 
 
+rule unpack_background:
+    input:
+        tarball="data/background.tar",
+    output:
+        metadata="builds/metadata_background.tsv",
+        sequences="builds/sequences_background.fasta",
+    shell:
+        """
+        mkdir -p builds/tmpbackground
+        tar -xvf {input.tarball} -C builds/tmpbackground
+        mv builds/tmpbackground/*.metadata.tsv {output.metadata}
+        mv builds/tmpbackground/*.fasta {output.sequences}
+        rm -rf builds/tmpbackground
+        """
+
+
 # rule filter_BA286:
 #     input:
 #         metadata="builds/metadata_21L.tsv.zst",
@@ -114,7 +131,7 @@ rule unpack_BA286:
 
 
 rule postprocess_dates:
-    """ 
+    """
     - Add XX to incomplete dates
     - Convert Danish dates to date ranges
     """
@@ -195,7 +212,9 @@ rule subsample_21L_region:
 
 rule collect_metadata:
     input:
-        regions=expand("builds/metadata_21L_{region}_subsampled.tsv", region=regions),
+        background=lambda w: "builds/metadata_background.tsv"
+        if use_frozen_background
+        else expand("builds/metadata_21L_{region}_subsampled.tsv", region=regions),
         BA286="builds/metadata_BA286.tsv",
         consensus_metadata="config/consensus_metadata.tsv",
     output:
@@ -215,21 +234,31 @@ rule collect_metadata:
         """
 
 
-rule collect_sequences:
+rule get_sampled_sequences:
     input:
         sequences="builds/sequences_21L.fasta.zst",
-        strain_names="builds/strains_sample.txt",
+        strain_names="builds/metadata_sample.tsv",
+    output:
+        sequences="builds/sequences_sampled.fasta",
+    shell:
+        """
+        zstdcat {input.sequences} \
+        | seqkit grep -f {input.strain_names} >{output.sequences}
+        """
+
+
+rule collect_sequences:
+    input:
+        background=lambda w: "builds/sequences_background.fasta"
+        if use_frozen_background
+        else "builds/sequences_sampled.fasta",
         consensus_sequences="config/consensus_sequences.fasta",
         BA286="builds/sequences_BA286.fasta",
     output:
         sequences="builds/sequences_sample.fasta",
     shell:
         """
-        mkdir -p builds/tmp
-        zstdcat {input.sequences} \
-        | seqkit grep -f {input.strain_names} >builds/tmp/seq.fasta
-        seqkit seq -w 0 builds/tmp/seq.fasta {input.consensus_sequences} {input.BA286} >{output.sequences}
-        rm builds/tmp/seq.fasta
+        seqkit seq -w 0 {input} >{output.sequences}
         """
 
 
@@ -375,30 +404,24 @@ rule fix_iqtree:
         """
 
 
-rule refine:
+rule create_figure:
     input:
+        metadata="builds/metadata.tsv",
         tree="builds/tree_fixed.nwk",
         alignment="builds/aligned.fasta",
-        metadata="builds/metadata.tsv",
     output:
-        tree="builds/tree.nwk",
+        figure="figures/timetree.pdf",
         node_data="builds/branch_lengths.json",
+        tree="builds/tree.nwk",
     shell:
         """
-        augur refine \
+        python3 scripts/timetree_inference.py \
+            --metadata {input.metadata} \
             --tree {input.tree} \
             --alignment {input.alignment} \
-            --divergence-units mutations \
-            --output-tree {output.tree} \
-            --metadata {input.metadata} \
+            --figure {output.figure} \
             --output-node-data {output.node_data} \
-            --timetree \
-            --coalescent skyline \
-            --keep-polytomies \
-            --date-inference marginal \
-            --root "BA.2" \
-            --date-confidence \
-            --no-covariance
+            --output-tree {output.tree}
         """
 
 
@@ -427,21 +450,10 @@ rule ancestral:
         """
 
 
-def _get_node_data_by_wildcards(wildcards):
-    """Return a list of node data files to include for a given build's wildcards."""
-    # Define inputs shared by all builds.
-    wildcards_dict = dict(wildcards)
-    inputs = [
-        rules.refine.output.node_data,
-    ]
-    inputs = [input_file.format(**wildcards_dict) for input_file in inputs]
-    return inputs
-
-
 rule export:
     input:
         tree="builds/tree.nwk",
-        node_data=_get_node_data_by_wildcards,
+        node_data="builds/branch_lengths.json",
         ancestral="builds/muts.json",
         auspice_config="config/auspice_config.json",
         lat_longs=rules.download_lat_longs.output,
@@ -461,25 +473,6 @@ rule export:
             --output {output.auspice_json} \
             --metadata {input.metadata} \
             --description {input.description}
-        """
-
-
-rule create_figure:
-    input:
-        metadata="builds/metadata.tsv",
-        tree="builds/tree.nwk",
-        alignment="builds/aligned.fasta",
-    output:
-        figure="figures/timetree.pdf",
-        auspice_json="auspice/tt.json",
-    shell:
-        """
-        python3 scripts/timetree_inference.py \
-            --metadata {input.metadata} \
-            --tree {input.tree} \
-            --alignment {input.alignment} \
-            --figure {output.figure} \
-            --auspice {output.auspice_json}
         """
 
 
