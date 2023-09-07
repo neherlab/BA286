@@ -1,0 +1,9 @@
+The phylogenetic analysis was performed in a snakemake workflow using the augur toolchain.
+
+A globally diverse set of 280 BA.2 (Nextstrain clade 21L) sequences was sampled from ncov-ingest preprocessed good quality sequences collected between November 2021 and June 2022 and deposited on GISAID. BA.2.86 sequences were download on September 7 2023 directly from GISAID.
+
+Sequences were pairwise aligned against Wuhan-Hu-1 using Nextclade. Terminals and gaps were masked as well as all suspected artefactual reversions to reference in BA.2.86 sequences. Sequences with less than 90% coverage of the reference were excluded.
+
+A tree was built using IQ-tree 2 through and postprocessed using a custom script to correct IQ-tree errors due to presence of large polytomies.
+
+A time tree was inferred using TreeTime. The clock rate of the long branch between BA.2 and BA.2.86 was set to be 2 times the rate of the rest of the tree in line with Neher (2022), as non-synonymous mutations have been observed to accumulate at a substantially higher rate on long branches leading to new variants than once a variant is being transmitted widely.
