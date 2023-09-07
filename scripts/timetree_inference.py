@@ -13,6 +13,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--metadata', default='builds/metadata.tsv')
     parser.add_argument('--tree', default='builds/tree.nwk')
+    parser.add_argument('--output-tree')
+    parser.add_argument('--output-node-data')
     parser.add_argument('--alignment', default='builds/aligned.fasta')
     parser.add_argument('--figure', default='figures/timetree.pdf')
     parser.add_argument('--auspice', default='auspice/tt.json')
@@ -54,6 +56,23 @@ if __name__ == '__main__':
         import json
         json.dump(auspice, fh, indent=2)
 
+    if args.output_tree:
+        Phylo.write(tt.tree, args.output_tree, 'newick')
+
+    node_data = {"nodes":{}}
+    for n in tt.tree.find_clades():
+        conf = tt.get_max_posterior_region(n, fraction=0.9)
+        node_data['nodes'][n.name] = {'branch_length': len([p for a,p,d in n.mutations if a in 'ACGT' and d in 'ACGT']),
+                                      'clock_length': n.clock_length,
+                                      'numdate':n.numdate,
+                                      'date': n.date,
+                                      'num_date_confidence':[float(conf[0]), float(conf[1])]}
+
+    if args.output_node_data:
+        import json
+        with open(args.output_node_data, 'w') as fh:
+            json.dump(node_data, fh, indent=1)
+
     from treetime.treetime import plot_vs_years
     from treetime.utils import datestring_from_numeric
 
@@ -66,8 +85,9 @@ if __name__ == '__main__':
         else:
             return ""
 
-    fig = plt.figure(figsize=(7,5))
+    fig = plt.figure(figsize=(8,6))
     ax = fig.add_axes(111)
+    fs=12
     from matplotlib.colors import to_hex
     region_colors = {r:to_hex(f'C{i}') for i,r in enumerate(d.region.unique())}
 
@@ -91,9 +111,10 @@ if __name__ == '__main__':
     for region in sorted(region_colors.keys()):
         if region=='?': continue
         tips = [n for n in tt.tree.get_terminals() if d.loc[n.name, 'region']==region]
-        plt.scatter([n.x for n in tips],  [n.y for n in tips], c=region_colors[region], label=region, zorder=2)
+        plt.scatter([n.x for n in tips],  [n.y for n in tips],
+                    c=region_colors[region], label=region, zorder=2, s=20)
 
-    plt.legend()
+    plt.legend(fontsize=fs)
     tick_labels = []
     tick_positions = []
     for p, x in zip(plt.xticks()[0][::2], plt.xticks()[1][::2]):
@@ -102,7 +123,7 @@ if __name__ == '__main__':
 
     plt.xticks(tick_positions, tick_labels, ha='right')
     plt.yticks([])
-    plt.tick_params(rotation=30)
+    plt.tick_params(rotation=30, labelsize=fs)
     ax.set_axis_on()
     plt.xlabel('')
     plt.tight_layout()
