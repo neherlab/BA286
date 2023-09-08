@@ -3,3 +3,4 @@ reason: true
 printshellcmds: true
 keep-going: true
 rerun-incomplete: true
+configfile: profiles/default/config_dict.yaml

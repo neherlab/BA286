@@ -1,5 +1,13 @@
-regions = ["Europe", "America", "Oceania", "Asia", "Africa"]
-use_frozen_background = True
+use_frozen_background = config["use_frozen_background"]
+use_open_data = config["use_open_data"]
+regions = config["regions"]
+samples = config["samples"]
+genes = config["genes"]
+
+if use_open_data:
+    prefix = "s3://nextstrain-data/files/ncov/open/"
+else:
+    prefix = "s3://nextstrain-ncov-private/"
 
 
 rule build:
@@ -19,22 +27,19 @@ wildcard_constraints:
 rule download_sequences:
     output:
         sequences="data/sequences.fasta.zst",
+    params:
+        url=prefix + "aligned.fasta.zst",
     shell:
-        "aws s3 cp s3://nextstrain-ncov-private/aligned.fasta.zst {output.sequences}"
+        "aws s3 cp {params.url} {output.sequences}"
 
 
 rule download_metadata:
     output:
         metadata="data/metadata.tsv.zst",
+    params:
+        url=prefix + "metadata.tsv.zst",
     shell:
-        "aws s3 cp s3://nextstrain-ncov-private/metadata.tsv.zst {output.metadata}"
-
-
-rule download_nextclade_dataset:
-    output:
-        directory("builds/nextclade_dataset"),
-    shell:
-        "nextclade dataset get --name='sars-cov-2' --output-dir={output}"
+        "aws s3 cp {params.url} {output.metadata}"
 
 
 rule download_lat_longs:
@@ -82,6 +87,40 @@ rule filter_21L_sequences:
         """
 
 
+rule filter_21L_region:
+    input:
+        metadata="builds/metadata_21L.tsv.zst",
+    output:
+        metadata="builds/metadata_21L_{region}.tsv.zst",
+    shell:
+        """
+        zstdcat {input} \
+        | tsv-filter -H --str-in-fld "region:{wildcards.region}" \
+        | zstd >{output.metadata}
+        """
+
+
+rule subsample_21L_region:
+    input:
+        metadata="builds/metadata_21L_{region}.tsv.zst",
+    output:
+        metadata="builds/metadata_21L_{region}_subsampled.tsv",
+    params:
+        number=lambda w: samples[w.region],
+    shell:
+        """
+        augur filter \
+            --metadata {input.metadata} \
+            --min-date 2021-11-01 \
+            --max-date 2022-06-01 \
+            --exclude-ambiguous-dates-by any \
+            --exclude-where "reversion_mutations!=0" "QC_stop_codons!=good" "QC_frame_shifts!=good" "QC_snp_clusters!=good" "QC_rare_mutations!=good" "QC_missing_data!=good" \
+            --subsample-max-sequences {params.number} \
+            --subsample-seed 42 \
+            --output-metadata {output.metadata}
+        """
+
+
 rule unpack_BA286:
     """
     Need to download the tarball from GISAID and place it in the data directory.
@@ -102,6 +141,9 @@ rule unpack_BA286:
 
 
 rule unpack_background:
+    """
+    Frozen background for reproducibility
+    """
     input:
         tarball="data/background.tar",
     output:
@@ -115,19 +157,6 @@ rule unpack_background:
         mv builds/tmpbackground/*.fasta {output.sequences}
         rm -rf builds/tmpbackground
         """
-
-
-# rule filter_BA286:
-#     input:
-#         metadata="builds/metadata_21L.tsv.zst",
-#     output:
-#         metadata="builds/metadata_BA286_raw.tsv",
-#     shell:
-#         """
-#         zstdcat {input} \
-#         | tsv-filter -H --str-in-fld Nextclade_pango:"BA.2.86" \
-#         >{output.metadata}
-#         """
 
 
 rule postprocess_dates:
@@ -167,49 +196,6 @@ rule postprocess_dates:
         df.to_csv(output.metadata, sep="\t", index=False)
 
 
-rule filter_21L_region:
-    input:
-        metadata="builds/metadata_21L.tsv.zst",
-    output:
-        metadata="builds/metadata_21L_{region}.tsv.zst",
-    shell:
-        """
-        zstdcat {input} \
-        | tsv-filter -H --str-in-fld "region:{wildcards.region}" \
-        | zstd >{output.metadata}
-        """
-
-
-samples = {
-    "Europe": 40,
-    "America": 50,
-    "Oceania": 10,
-    "Asia": 80,
-    "Africa": 100,
-}
-
-
-rule subsample_21L_region:
-    input:
-        metadata="builds/metadata_21L_{region}.tsv.zst",
-    output:
-        metadata="builds/metadata_21L_{region}_subsampled.tsv",
-    params:
-        number=lambda w: samples[w.region],
-    shell:
-        """
-        augur filter \
-            --metadata {input.metadata} \
-            --min-date 2021-11-01 \
-            --max-date 2022-06-01 \
-            --exclude-ambiguous-dates-by any \
-            --exclude-where "reversion_mutations!=0" "QC_stop_codons!=good" "QC_frame_shifts!=good" "QC_snp_clusters!=good" "QC_rare_mutations!=good" "QC_missing_data!=good" \
-            --subsample-max-sequences {params.number} \
-            --subsample-seed 42 \
-            --output-metadata {output.metadata}
-        """
-
-
 rule collect_metadata:
     input:
         background=lambda w: "builds/metadata_background.tsv"
@@ -237,7 +223,7 @@ rule collect_metadata:
 rule get_sampled_sequences:
     input:
         sequences="builds/sequences_21L.fasta.zst",
-        strain_names="builds/metadata_sample.tsv",
+        strain_names="builds/strains_sample.txt",
     output:
         sequences="builds/sequences_sampled.fasta",
     shell:
@@ -262,22 +248,6 @@ rule collect_sequences:
         """
 
 
-genes = [
-    "E",
-    "M",
-    "N",
-    "ORF1a",
-    "ORF1b",
-    "ORF3a",
-    "ORF6",
-    "ORF7a",
-    "ORF7b",
-    "ORF8",
-    "ORF9b",
-    "S",
-]
-
-
 rule exclude_outliers:
     input:
         sequences="builds/sequences_sample.fasta",
@@ -300,17 +270,17 @@ rule exclude_outliers:
 rule nextalign_before_mask:
     input:
         fasta="builds/sequences.fasta",
-        dataset=rules.download_nextclade_dataset.output,
+        reference="config/reference.fasta",
+        genemap="config/genemap.gff",
     output:
         alignment="builds/premask.fasta",
     shell:
         """
         nextalign run \
-            --input-ref "builds/nextclade_dataset/reference.fasta" \
-            --input-gene-map "builds/nextclade_dataset/genemap.gff" \
-            {input.fasta} \
+            --input-ref {input.reference} \
+            --input-gene-map {input.genemap} \
             --output-fasta {output.alignment} \
-             2>&1
+            -- {input.fasta}
         """
 
 
@@ -351,7 +321,8 @@ rule mask:
 rule nextalign_after_mask:
     input:
         fasta="builds/masked.fasta",
-        dataset=rules.download_nextclade_dataset.output,
+        reference="config/reference.fasta",
+        genemap="config/genemap.gff",
     output:
         alignment="builds/aligned.fasta",
         translations=expand("builds/translations/gene.{gene}.fasta", gene=genes),
@@ -360,13 +331,12 @@ rule nextalign_after_mask:
     shell:
         """
         nextalign run \
-            --input-ref "builds/nextclade_dataset/reference.fasta" \
-            --input-gene-map "builds/nextclade_dataset/genemap.gff" \
+            --input-ref {input.reference} \
+            --input-gene-map {input.genemap} \
             --genes E,M,N,ORF1a,ORF1b,ORF3a,ORF6,ORF7a,ORF7b,ORF8,ORF9b,S \
-            {input.fasta} \
             --output-translations {params.template_string} \
             --output-fasta {output.alignment} \
-             2>&1
+            -- {input.fasta}
         """
 
 

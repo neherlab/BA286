@@ -1,0 +1,30 @@
+use_frozen_background: false
+use_open_data: false
+
+regions:
+  - Europe
+  - America
+  - Oceania
+  - Asia
+  - Africa
+
+samples:
+  Europe: 40
+  America: 50
+  Oceania: 10
+  Asia: 80
+  Africa: 100
+
+genes:
+  - "N"
+  - E
+  - M
+  - ORF1a
+  - ORF1b
+  - ORF3a
+  - ORF6
+  - ORF7a
+  - ORF7b
+  - ORF8
+  - ORF9b
+  - S
