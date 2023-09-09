@@ -18,7 +18,7 @@ For the paper, we sampled the BA.2 background set based on an [ncov-ingest](http
 
 ### BA.2 background set
 
-Unfortunately, we cannot share the `ncov-ingest` curated data due to GISAID's data sharing policy. However, to at least partially reproduce the subsampling part of the analysis, you can use `ncov-ingest`'s "open" data, which is based on Genbank data and is freely available. To do so, you need to add `--config data_source=open` to the workflow invocation (or set that option in `config/config_dict.yaml`).
+Unfortunately, we cannot share the `ncov-ingest` curated data due to GISAID's data sharing policy. However, to at least partially reproduce the subsampling part of the analysis, you can use `ncov-ingest`'s "open" data, which is based on Genbank data and is freely available but less globally representative and balanced. To do so, you need to add `--config data_source=open` to the workflow invocation (or set that option in `config/config_dict.yaml`).
 
 The other option is to use the exact BA.2 sequences from the paper. To do so, download the "Input for Augur pipeline" tarball for `EPI_SET_230907cf` from GISAID and place the archive at `data/background.tar`. Then, add `--config data_source=frozen` to the workflow invocation (or set that option in `config/config_dict.yaml`).
 
@@ -26,7 +26,7 @@ We generated the build using `--config data_source=gisaid`.
 
 ### BA.2.86 sequences
 
-Besides the BA.2 data, you also need to download BA.2.86 sequences from GISAID. To reproduce the analysis in the paper with the exact BA.2.86 sequences, download `EPI_SET_230909co` and place the archive at `data/BA286.tar`. Alternatively, you can use the sequences from the paper by adding `--config use_frozen_gisaid=true` to the workflow invocation (or set that option in `config/config_dict.yaml`).
+Besides the BA.2 data, you also need to download BA.2.86 sequences from GISAID. To reproduce the analysis in the paper with the exact BA.2.86 sequences, download `EPI_SET_230909co` and place the archive at `data/BA286.tar`. Alternatively, you can use the sequences from the paper by adding `--config data_source=frozen` to the workflow invocation (or set that option in `config/config_dict.yaml`).
 
 Alternatively, you can download any set of BA.2.86 sequences (for example more current) and also use them for the analysis. Just download the "Input for Augur pipeline" tarball from GISAID and place the archive at `data/BA286.tar`.
 
