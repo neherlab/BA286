@@ -1,5 +1,7 @@
 # Phylogenetic analysis of BA.2.86
 
+Preprint: <https://www.medrxiv.org/content/10.1101/2023.09.08.23295250v1>
+
 ## Installation
 
 1. Install Nexstrain CLI following the instructions at <https://docs.nextstrain.org/projects/cli/en/stable/installation/>
