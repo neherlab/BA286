@@ -1,8 +1,0 @@
-We assembled a set 280 BA.2 (Nextstrain clade 21L) sequences collected between November 2021 and June 2022 from data deposited on GISAID [GISAIDRef]. BA.2.86 sequences were downloaded on September 7 2023 directly from GISAID. We excluded sequences with reversion mutations relative to BA.2, sequences flagged as poor quality by Nextclade [Aksamentov], or sequences with less than 90% coverage of the reference. Sequences were pairwise aligned against Wuhan-Hu-1 using Nextclade. Terminals and gaps were masked as well as all suspected artefactual reversions to reference in BA.2.86 sequences. A tree was built using IQ-tree 2 and postprocessed using a custom script to correct for incomplete merging of branches in large polytomies.
-
-A time tree was inferred using TreeTime using a clock rate of 0.0005 per site and year [Neher 2022]. The rate of the long branch between BA.2 and BA.2.86 was set to be 2 times the rate of the rest of the tree in line with previous observation that evolution is 2-fold accelerated along many long branches leading to distinct clades [Neher (2022)]. This acceleration is consistent with the dramatic enrichment of amino acid substitutions in the spike protein along the long branch leading to BA.2.86.
-
-The phylogenetic workflow was implemented with snakemake using the augur [Huddleston et a] toolchain and is available at github.com/neherlab/BA286. The repo contains a specific list of sites  (config/mask.tsv) that are masked in individual sequences.
-
-
-

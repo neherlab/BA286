@@ -1,15 +1,18 @@
-This phylogeny shows diversity within the BA.2.86 variant from the ongoing novel coronavirus COVID-19 pandemic.
+This phylogeny shows diversity within the BA.2.86 variant and its relationship to a global sample of BA.2 sequences.
 
-All published BA.2.86 sequences are included.
-
-The following sites are masked (plus 100 nt from beginning and 200nt from end):
-In hCoV-19/Israel/ICH-741198454/2023: 22786,23222 (likely primer trimming artefacts)
-
-The analysis is maintained by
+The analysis was created by:
 
 * [Cornelius Roemer](https://neherlab.org) at Biozentrum of the University of Basel and the Swiss Institute of Bioinformatics
 * [Richard Neher](https://neherlab.org) at Biozentrum of the University of Basel and the Swiss Institute of Bioinformatics
 
-All data we use are deposited in GISAID.
+BA.2.86 was identified by global genomic surveillance in mid-August 2023 in samples collected from 24 July 2023 onwards. BA.2.86 shares the synonymous mutation C26681T with BA.2 genomes sampled in South Africa in early 2022, while it lacks the mutation C9866T that is present in the great majority of BA.2 sequences sampled outside of Southern Africa (Fig 1B). South African sequences were also closely related to the putative ancestral sequence of BA.2.86 with at least 8 lineages dominated by samples from South Africa that directly descend from a basal polytomy (Fig 1B). Most sequences from the Northern Hemisphere fall into a second large polytomy (BA.2.86.1) separated from the basal polytomy by two mutations. BA.2.86 sequences sampled in August 2023 differ from the most recent common ancestor (MRCA) by 1-7 mutations. Most samples available by 7 September 2023 were collected mid-August and have 3-5 additional mutations. Along acute transmission chains, SARS-CoV-2 accumulates about 15 mutations per year and we thus estimate that this subvariant started to spread about May 2023 [Neher (2022)](https://academic.oup.com/ve/article/8/2/veac113/6887176). The estimate is corroborated by time tree inference with TreeTime, suggesting an emergence date in early May with an uncertainty of about two months.
+
+We assembled a set of 280 BA.2 (Nextstrain clade 21L) sequences collected between November 2021 and June 2022 from data deposited on [GISAID](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5388101/). BA.2.86 sequences were downloaded on September 7 2023 directly from GISAID. We excluded sequences with reversion mutations relative to BA.2, sequences flagged as poor quality by [Nextclade](https://joss.theoj.org/papers/10.21105/joss.03773), or sequences with less than 90% coverage of the reference. Sequences were pairwise aligned against Wuhan-Hu-1 using Nextclade. Terminals and gaps were masked as well as all suspected artefactual reversions to reference in BA.2.86 sequences. A tree was built using [IQ-tree 2](https://pubmed.ncbi.nlm.nih.gov/32011700/) and postprocessed using a custom script to correct for incomplete merging of branches in large polytomies.
+
+A time tree was inferred using [TreeTime](https://pubmed.ncbi.nlm.nih.gov/29340210) using a clock rate of 0.0005 per site and year [Neher (2022)](https://academic.oup.com/ve/article/8/2/veac113/6887176). The rate of the long branch between BA.2 and BA.2.86 was set to be 2 times the rate of the rest of the tree in line with previous observation that evolution is 2-fold accelerated along many long branches leading to distinct clades [Neher (2022)](https://academic.oup.com/ve/article/8/2/veac113/6887176). This acceleration is consistent with the dramatic enrichment of amino acid substitutions in the spike protein along the long branch leading to BA.2.86.
+
+The phylogenetic workflow is available at <https://www.github.com/neherlab/BA286>. The repository contains a specific list of sites (config/mask.tsv) that are masked in individual sequences.
+
+Sequences used in phylogenetic analysis: GISAID Identifier: EPI_SET_230907xn, doi: 10.55876/gis8.230907xn. All genome sequences and associated metadata in this dataset are published in GISAID’s EpiCoV database. To view the contributors of each individual sequence with details such as accession number, Virus name, Collection date, Originating Lab and Submitting Lab and the list of Authors, see 10.55876/gis8.230907xn
 
 We gratefully acknowledge the authors, originating and submitting laboratories of the genetic sequence and metadata made available through [GISAID](https://gisaid.org) on which this research is based. A full listing of all originating and submitting laboratories is available below. An attribution table is available by clicking on "Download Data" at the bottom of the page and then clicking on "Strain Metadata" in the resulting dialog box.

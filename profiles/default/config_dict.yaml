@@ -1,4 +1,4 @@
-use_frozen_background: false
+use_frozen_background: true
 use_open_data: false
 
 regions:

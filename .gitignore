@@ -6,3 +6,4 @@ data/
 deploy/*
 .DS_Store
 figures/
+.swp

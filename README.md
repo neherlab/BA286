@@ -2,12 +2,33 @@
 
 ## Installation
 
-- Nextstrain CLI with docker backend
-- TODO: Which docker image?
+1. Install Nexstrain CLI following the instructions at <https://docs.nextstrain.org/projects/cli/en/stable/installation/>
+2. Setup a runtime, e.g. "docker" using `nextstrain setup docker`
+3. Check your installation with `nextstrain check-setup --set-default`
 
-Requires treetime master (or at least v0.11.1 which is not yet released)
+To make sure you have the correct software versions, you can use this docker image: "TKTK".
 
-## Usage
+To use that docker image, you need to add the `--XXX` flag to the `nextstrain build` command.
+
+Note: The repo currently works only with `pip` installed `augur` as it requires treetime v0.11.1 or above. This will be fixed with the next Augur release.
+
+## Getting the data
+
+For the paper, we sampled the BA.2 background set based on an [ncov-ingest](https://www.github.com/nexstrain/ncov-ingest) curated GISAID data dump and downloaded BA.2.86 sequences from GISAID's web interface.
+
+### BA.2 background set
+
+Unfortunately, we cannot share the `ncov-ingest` curated data due to GISAID's data sharing policy. However, to at least partially reproduce the subsampling part of the analysis, you can use `ncov-ingest`'s "open" data, which is based on Genbank data and is freely available. To do so, you need to add `--config use_open_data=true` to the workflow invocation (or set that option in `config/config_dict.yaml`).
+
+The other option is to use the exact BA.2 sequences from the paper. To do so, download the "Input for Augur pipeline" tarball for `EPI_SET_230907cf` from GISAID and place the archive at `data/background.tar`. Then, add `--config use_frozen_background=true` to the workflow invocation (or set that option in `config/config_dict.yaml`).
+
+### BA.2.86 sequences
+
+Besides the BA.2 data, you also need to download BA.2.86 sequences from GISAID. To reproduce the analysis in the paper with the exact BA.2.86 sequences, download `EPI_SET_230909co` and place the archive at `data/BA286.tar`. Alternatively, you can use the sequences from the paper by adding `--config use_frozen_gisaid=true` to the workflow invocation (or set that option in `config/config_dict.yaml`).
+
+Alternatively, you can download any set of BA.2.86 sequences (for example more current) and also use them for the analysis. Just download the "Input for Augur pipeline" tarball from GISAID and place the archive at `data/BA286.tar`.
+
+## Running the workflow
 
 Run the workflow with:
 
@@ -15,24 +36,8 @@ Run the workflow with:
 nextstrain build .
 ```
 
-Result is viewable via:
+You can then view the resulting tree with Auspice using:
 
 ```bash
 nextstrain view auspice/BA.2.86.json
 ```
-
-Set `use_frozen_background` to `false` to generate a fresh sample of background BA.2 sequences.
-Otherwise, you need to put background sequences into `data/background.tar`.
-
-## Data
-
-Data used is from GISAID, curated using ncov-ingest
-
-As the data is not public, we cannot share it here. However, it is possible to run the analysis using Nextstrain-curated Genbank data (TODO: Howto)
-
-TODO: Allow reproducibility from selected GISAID sequences (using EPI set)
-
-## EPI_sets
-
-Background set: `EPI_SET_230907cf`, download "Input for Augur" and place in `data/background.tar`
-BA.2.86 sequences: download "Input for Augur pipeline" and place into `data/gisaid.tar`

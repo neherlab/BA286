@@ -1,7 +1,0 @@
-
-The BA.2.86 variant was first detected by Israel and Denmark in CW 33. The lineage descends from basel BA.2 sequences that circulated in late 2021 and the common ancestor of BA.2.86 shared to date differs from BA.2 by 50 nucleotide changes resulting in 28 amino acid substitutions in the spike protein. In addition to these amino acid substitutions, the lineage has a 4 amino acid insertion and several deletions in the spike protein. This long branch is likely the result of accelerated within-host evolution during chronic infections.
-
-Using consensus sequences from early BA.2 lineages and the recently shared BA.2.86 sequences, we constructed a phylogenetic tree using IQ-tree. Most BA.2.86 sequences differ at between 2 and 5 positions form the MRCA of BA.2.86. Assuming a rate of evolution of 0.0005/site/year (15/genome/year), this suggest that the MRCA was between 6 weeks and 4 month before the sampling date of these sequences (mostly early August), which translates into a date of emergence between early April and mid-June 2023. This is corroborated by an analysis with TreeTime, where we used a rate of 0.0005/site/year for within-variant branches and allowed a two-fold acceleration of the rate on the long branch leading to BA.2.86 (Neher, 2022).
-
-
-
