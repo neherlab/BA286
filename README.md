@@ -6,11 +6,11 @@
 2. Setup a runtime, e.g. "docker" using `nextstrain setup docker`
 3. Check your installation with `nextstrain check-setup --set-default`
 
-To make sure you have the correct software versions, you can use this docker image: "TKTK".
+The easiest way to make you have all the right software versions, you can use the docker image `corneliusroemer/ba286` with `nextstrain build`.
 
-To use that docker image, you need to add the `--XXX` flag to the `nextstrain build` command.
+To use that docker image, you need to add the `--docker --image=corneliusroemer/ba286` flags to the `nextstrain build` command.
 
-Note: The repo currently works only with `pip` installed `augur` as it requires treetime v0.11.1 or above. This will be fixed with the next Augur release.
+Note: If you don't use the docker image, you need to make sure you have treetime v0.11.1 (or higher) installed which is at the time of writing incompatible with augur. That's why it's easiest for now to use docker and not worry.
 
 ## Getting the data
 
@@ -33,7 +33,7 @@ Alternatively, you can download any set of BA.2.86 sequences (for example more c
 Run the workflow with:
 
 ```bash
-nextstrain build .
+nextstrain build --docker --image corneliusroemer/ba286 .
 ```
 
 You can then view the resulting tree with Auspice using:
