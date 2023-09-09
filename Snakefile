@@ -1,23 +1,24 @@
-use_frozen_background = config["use_frozen_background"]
-use_open_data = config["use_open_data"]
+data_source = config["data_source"]
 regions = config["regions"]
 samples = config["samples"]
 genes = config["genes"]
 
-if use_open_data:
-    prefix = "s3://nextstrain-data/files/ncov/open/"
+if data_source == "frozen":
+    use_frozen_background = True
 else:
+    use_frozen_background = False
+
+if data_source == "open":
+    use_open = True
+    prefix = "https://data.nextstrain.org/files/ncov/open/"
+else:
+    use_open = False
     prefix = "s3://nextstrain-ncov-private/"
 
 
 rule build:
     input:
         "auspice/BA.2.86.json",
-
-
-# rule deploy:
-#     input:
-#         "deploy/BA.2.86/latest",
 
 
 wildcard_constraints:
@@ -29,8 +30,15 @@ rule download_sequences:
         sequences="data/sequences.fasta.zst",
     params:
         url=prefix + "aligned.fasta.zst",
+        open=use_open,
     shell:
-        "aws s3 cp {params.url} {output.sequences}"
+        """
+        if [ {params.open} == True ]; then
+            curl {params.url} -o {output.sequences}
+        else
+            aws s3 cp {params.url} {output.sequences}
+        fi
+        """
 
 
 rule download_metadata:
@@ -38,8 +46,15 @@ rule download_metadata:
         metadata="data/metadata.tsv.zst",
     params:
         url=prefix + "metadata.tsv.zst",
+        open=use_open,
     shell:
-        "aws s3 cp {params.url} {output.metadata}"
+        """
+        if [ {params.open} == True ]; then
+            curl {params.url} -o {output.metadata}
+        else
+            aws s3 cp {params.url} {output.metadata}
+        fi
+        """
 
 
 rule download_lat_longs:
@@ -446,13 +461,11 @@ rule export:
         """
 
 
-# rule deploy_single:
-#     input:
-#         "auspice/ncov_{build}.json",
-#         "auspice/ncov_{build}_root-sequence.json",
-#     output:
-#         "deploy/{build}/latest",
-#     shell:
-#         """
-#         nextstrain remote upload nextstrain.org/groups/neherlab/ncov/BA.2.86 {input} 2>&1 && touch {output}
-#         """
+rule deploy:
+    input:
+        "auspice/BA.2.86.json",
+        "auspice/BA.2.86_root-sequence.json",
+    shell:
+        """
+        nextstrain remote upload nextstrain.org/groups/neherlab/ncov/BA.2.86 {input} 2>&1
+        """

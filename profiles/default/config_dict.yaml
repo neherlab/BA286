@@ -1,5 +1,6 @@
 use_frozen_background: true
 use_open_data: false
+data_source: frozen
 
 regions:
   - Europe
@@ -9,11 +10,11 @@ regions:
   - Africa
 
 samples:
-  Europe: 40
-  America: 50
-  Oceania: 10
-  Asia: 80
-  Africa: 100
+  Europe: 200
+  America: 300
+  Oceania: 50
+  Asia: 300
+  Africa: 400
 
 genes:
   - "N"
