@@ -77,7 +77,7 @@
     "division",
     "host",
     "author",
-    "submission_date",
+    "date_submitted",
     "originating_lab",
     "submitting_lab"
   ],
