@@ -197,7 +197,9 @@ rule postprocess_dates:
 
 
         def add_xx_to_incomplete_date(datestring):
-            if len(datestring) == 7:
+            if len(datestring) == 4:
+                return datestring + "-XX-XX"
+            elif len(datestring) == 7:
                 return datestring + "-XX"
             else:
                 return datestring

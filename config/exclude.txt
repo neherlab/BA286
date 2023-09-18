@@ -5,3 +5,4 @@ hCoV-19/env/Thailand/CU-077/2023
 hCoV-19/env/Thailand/CU-082/2023
 hCoV-19/Israel/SMC-7114868/2023
 hCoV-19/SouthAfrica/NHLS_NCV1886/2023
+hCoV-19/Russia/MOW-RII-MH143942S/2023
