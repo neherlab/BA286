@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from Bio import Phylo
 from treetime import TreeTime
-from treetime.CLI_io import create_auspice_json
 from treetime.utils import parse_dates
 
 
@@ -32,7 +31,7 @@ if __name__ == '__main__':
     T.root_with_outgroup("BA.2")
     # T.prune(T.find_any("hCoV-19/SouthAfrica/NICD-N55999/2023"))
 
-    tt = TreeTime(gtr='JC69', aln =args.alignment, tree=T, dates=dates, verbose=4)
+    tt = TreeTime(gtr='JC69', aln =args.alignment, tree=T, dates=dates, verbose=4, use_fft=True)
 
     long_branch = tt.tree.common_ancestor('hCoV-19/Denmark/DCGC-656489/2023', 'hCoV-19/Canada/BC-BCCDC-641728/2023')
 
