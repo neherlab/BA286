@@ -221,7 +221,7 @@ rule collect_metadata:
         BA286="builds/metadata_BA286.tsv",
         consensus_metadata="config/consensus_metadata.tsv",
     output:
-        metadata="builds/metadata_sample.tsv",
+        metadata="builds/metadata_sample_raw.tsv",
         strains="builds/strains_sample.txt",
     params:
         fields="strain,gisaid_epi_isl,date,region,country,division,location,host,age,sex,originating_lab,submitting_lab,authors,url,title,paper_url,date_submitted",
@@ -235,6 +235,28 @@ rule collect_metadata:
         tsv-append -H builds/tmpcollect/*.tsv >{output.metadata}
         tsv-select -H -f strain {output.metadata} >{output.strains}
         """
+
+
+rule rename_southern_africa:
+    """
+    Add a new column "renamed_region" to the metadata
+    This column is like "region" but if country is South Africa, region is "Southern Africa"
+    """
+    input:
+        metadata="builds/metadata_sample_raw.tsv",
+    output:
+        metadata="builds/metadata_sample.tsv",
+    run:
+        import pandas as pd
+
+        df = pd.read_csv(input.metadata, sep="\t", low_memory=False, dtype=str)
+        df["renamed_region"] = df.region
+        df.loc[df.renamed_region == "Africa", "renamed_region"] = "Other Africa"
+        df.loc[
+            df["country"].isin(["South Africa", "Eswatini", "Namibia"]),
+            "renamed_region",
+            ] = "Southern Africa"
+        df.to_csv(output.metadata, sep="\t", index=False)
 
 
 rule get_sampled_sequences:
@@ -437,6 +459,23 @@ rule ancestral:
         """
 
 
+rule colors:
+    input:
+        ordering="config/color_ordering.tsv",
+        color_schemes="config/color_schemes.tsv",
+        metadata="builds/metadata.tsv",
+    output:
+        colors="builds/colors.tsv",
+    shell:
+        """
+        python3 scripts/assign-colors.py \
+            --ordering {input.ordering} \
+            --color-schemes {input.color_schemes} \
+            --output {output.colors} \
+            --metadata {input.metadata} 2>&1
+        """
+
+
 rule export:
     input:
         tree="builds/tree.nwk",
@@ -445,21 +484,37 @@ rule export:
         auspice_config="config/auspice_config.json",
         lat_longs=rules.download_lat_longs.output,
         metadata="builds/metadata.tsv",
+        colors="builds/colors.tsv",
         description="config/description.md",
     output:
-        auspice_json="auspice/BA.2.86.json",
-        root_json="auspice/BA.2.86_root-sequence.json",
+        auspice_json="builds/BA.2.86.json",
+        root_json="builds/BA.2.86_root-sequence.json",
     shell:
         """
         augur export v2 \
             --tree {input.tree} \
             --node-data {input.node_data} {input.ancestral} \
+            --colors {input.colors} \
             --include-root-sequence \
             --auspice-config {input.auspice_config} \
             --lat-longs {input.lat_longs} \
             --output {output.auspice_json} \
             --metadata {input.metadata} \
             --description {input.description}
+        """
+
+
+rule postprocessing:
+    input:
+        auspice="builds/BA.2.86.json",
+        root="builds/BA.2.86_root-sequence.json",
+    output:
+        auspice="auspice/BA.2.86.json",
+        root="auspice/BA.2.86_root-sequence.json",
+    shell:
+        """
+        python3 scripts/postprocess.py
+        cp {input.root} {output.root}
         """
 
 

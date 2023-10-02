@@ -27,6 +27,11 @@
       "type": "categorical"
     },
     {
+      "key": "renamed_region",
+      "title": "Renamed Region",
+      "type": "categorical"
+    },
+    {
       "key": "host",
       "title": "Host",
       "type": "categorical"
