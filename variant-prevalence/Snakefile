@@ -1,0 +1,34 @@
+rule all:
+    input:
+        "results/weekly-variant-counts-south-africa.tsv",
+
+
+rule dowload_metadata:
+    output:
+        "results/metadata.tsv.zst",
+    shell:
+        """
+        aws s3 cp s3://nextstrain-ncov-private/metadata.tsv.zst {output}
+        """
+
+
+rule filter_south_africa:
+    input:
+        "results/metadata.tsv.zst",
+    output:
+        "results/metadata-south-africa.tsv",
+    shell:
+        """
+        zstdcat {input} | tsv-filter -H --str-in-fld country:"South Africa" > {output}
+        """
+
+
+rule classify_variants:
+    input:
+        "results/metadata-south-africa.tsv",
+    output:
+        "results/weekly-variant-counts-south-africa.tsv",
+    shell:
+        """
+        python3 scripts/classify_variants.py
+        """

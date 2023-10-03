@@ -1,4 +1,4 @@
-.snakemake/*
+.snakemake/
 builds/*
 auspice/*
 data/
@@ -7,3 +7,4 @@ deploy/*
 .DS_Store
 figures/
 .swp
+results/
