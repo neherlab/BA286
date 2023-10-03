@@ -15,6 +15,7 @@ import json
 
 # Load reference as string
 ref = str(SeqIO.read("config/reference.fasta", "fasta").seq)
+ref_BA2 = str(SeqIO.read("config/consensus_sequences.fasta", "fasta").seq)
 # print(ref)
 # %%
 # Get .tree from auspice json
@@ -48,6 +49,11 @@ reversions = get_reversions(tree["children"], ref)
 
 # %%
 
+print("Reversions to Wuhan")
 for node, reversion in reversions:
     print(f"{node}\t{reversion[1:-1]}")
 # %%
+
+print("\nReversions to BA.2")
+for node, reversion in get_reversions(tree["children"], ref_BA2):
+    print(f"{node}\t{reversion[1:-1]}")
