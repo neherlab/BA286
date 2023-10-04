@@ -112,3 +112,38 @@ wide.to_csv("results/weekly-variant-counts-south-africa.tsv", sep="\t", columns=
 # wide[[col for col in wide.columns if (col.endswith("_pct") and col != "most_common_pct")]].plot.line(figsize=(12, 6), title="SARS-CoV-2 variant proportions in South Africa")
 
 # %%
+# Extract new df that only has the pct columns and remove the _pct suffix
+pdf = wide[[col for col in wide.columns if (col.endswith("_pct") and col != "most_common_pct")]].copy()
+pdf.columns = [col.replace("_pct", "") for col in pdf.columns]
+
+# Convert index to datetime
+pdf.index = pd.to_datetime(pdf.index)
+
+# %%
+# Make plot, using matplotlib
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(figsize=(12, 6))
+# pdf.plot.line(ax=ax, title="SARS-CoV-2 variant proportions in South Africa")
+ax.plot(pdf.index, pdf)
+ax.set_title("SARS-CoV-2 variant proportions in South Africa")
+
+# Label the x-axis
+ax.set_xlabel("collection date (week)")
+ax.set_ylabel("proportion of samples (%)")
+ax.set_xlim(pdf.index.min(), pdf.index.max())
+ax.set_ylim(0, 101)
+ax.legend(pdf.columns)
+
+
+# Set pretty date format
+import matplotlib.dates as mdates
+locator = mdates.AutoDateLocator(minticks=10, maxticks=25)
+formatter = mdates.ConciseDateFormatter(locator)
+ax.xaxis.set_major_formatter(formatter)
+locator = ax.xaxis.set_major_locator(locator)
+
+
+# Save figure
+fig.savefig("results/weekly-variant-proportions-south-africa.png", dpi=300, bbox_inches="tight")
+
+# %%
