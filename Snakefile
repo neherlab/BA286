@@ -287,6 +287,20 @@ rule collect_sequences:
         """
 
 
+rule epi_sets:
+    input:
+        ba286="builds/metadata_BA286.tsv",
+        total="builds/metadata_sample_raw.tsv",
+    output:
+        ba286="builds/epi_sets/BA286.txt",
+        total="builds/epi_sets/total.txt",
+    shell:
+        """
+        tsv-select -H -f gisaid_epi_isl {input.ba286} | tail -n +2 >{output.ba286}
+        tsv-select -H -f gisaid_epi_isl {input.total} | tail -n +2 >{output.total}
+        """
+
+
 rule exclude_outliers:
     input:
         sequences="builds/sequences_sample.fasta",

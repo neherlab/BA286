@@ -13,6 +13,6 @@ A time tree was inferred using [TreeTime](https://pubmed.ncbi.nlm.nih.gov/293402
 
 The phylogenetic workflow is available at <https://www.github.com/neherlab/BA286>. The repository contains a specific list of sites (config/mask.tsv) that are masked in individual sequences.
 
-Sequences used in phylogenetic analysis: GISAID Identifier: EPI_SET_230907xn, doi: 10.55876/gis8.230907xn. All genome sequences and associated metadata in this dataset are published in GISAID’s EpiCoV database. To view the contributors of each individual sequence with details such as accession number, Virus name, Collection date, Originating Lab and Submitting Lab and the list of Authors, see 10.55876/gis8.230907xn
+Sequences used in phylogenetic analysis: GISAID Identifier: EPI_SET_231003fr. All genome sequences and associated metadata in this dataset are published in GISAID’s EpiCoV database. To view the contributors of each individual sequence with details such as accession number, Virus name, Collection date, Originating Lab and Submitting Lab and the list of Authors, see <https://doi.org/10.55876/gis8.231003fr>
 
 We gratefully acknowledge the authors, originating and submitting laboratories of the genetic sequence and metadata made available through [GISAID](https://gisaid.org) on which this research is based. A full listing of all originating and submitting laboratories is available below. An attribution table is available by clicking on "Download Data" at the bottom of the page and then clicking on "Strain Metadata" in the resulting dialog box.
