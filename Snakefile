@@ -136,6 +136,21 @@ rule subsample_21L_region:
         """
 
 
+rule get_tarball:
+    """
+    Copy tarball from ~/Downloads to data directory
+    Get the most recent tarball (by date)
+    """
+    output:
+        tarball="data/gisaid.tar",
+    shell:
+        """
+        latest_tarball=$(ls -lt ~/Downloads/gisaid_auspice_input_hcov-19_202*.tar | head -n1 | awk '{{print $9}}')
+        echo $latest_tarball
+        cp $latest_tarball {output.tarball}
+        """
+
+
 rule unpack_BA286:
     """
     Need to download the tarball from GISAID and place it in the data directory.
