@@ -209,9 +209,6 @@ rule postprocess_dates:
         df.loc[df.country == "Denmark", "date"] = df.loc[
             df.country == "Denmark", "date"
         ].apply(danish_daterange)
-        df.loc[df.submitting_lab == "National Reference Center for Viruses of Respiratory Infections, Institut Pasteur, Paris", "date"] = df.loc[
-            df.submitting_lab == "National Reference Center for Viruses of Respiratory Infections, Institut Pasteur, Paris", "date"
-        ].apply(danish_daterange)
         df.date = df.date.apply(add_xx_to_incomplete_date)
         df.to_csv(output.metadata, sep="\t", index=False)
 
