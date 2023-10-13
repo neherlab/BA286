@@ -143,11 +143,13 @@ rule get_tarball:
     """
     output:
         tarball="data/gisaid.tar",
+    params:
+        lastest_tarball_cmd='find /Users/corneliusromer/Downloads/ -maxdepth 1 -name "gisaid_auspice_input_hcov-19_202*.tar" | sed "s/.\{4\}$//" | sort | tail -1 | sed "s/$/.tar/"',
     shell:
         """
-        latest_tarball=$(ls -lt ~/Downloads/gisaid_auspice_input_hcov-19_202*.tar | head -n1 | awk '{{print $9}}')
-        echo $latest_tarball
-        cp $latest_tarball {output.tarball}
+        latest_tarball=$(find /Users/corneliusromer/Downloads/ -maxdepth 1 -name "gisaid_auspice_input_hcov-19_202*.tar" | sed "s/....$//" | sort | tail -1 | sed "s/$/.tar/")
+        echo "$latest_tarball"
+        cp "$latest_tarball" {output.tarball}
         """
 
 
@@ -156,17 +158,24 @@ rule unpack_BA286:
     Need to download the tarball from GISAID and place it in the data directory.
     """
     input:
-        tarball="data/gisaid.tar",
+        "data/gisaid.tar",
     output:
         metadata="builds/metadata_BA286_raw.tsv",
         sequences="builds/sequences_BA286.fasta",
+    params:
+        cache="data/cache",
     shell:
         """
         mkdir -p builds/tmp
-        tar -xvf {input.tarball} -C builds/tmp
-        mv builds/tmp/*.metadata.tsv {output.metadata}
-        mv builds/tmp/*.fasta {output.sequences}
-        rm -rf builds/tmp
+        tar -xvf {input} -C builds/tmp
+        cp {params.cache}/* builds/tmp
+        tsv-uniq -H -f strain builds/tmp/*.tsv >{output.metadata}
+        cat builds/tmp/*.fasta | seqkit rmdup -n >{output.sequences}
+        # rm -rf builds/tmp
+        cp {output.metadata} {params.cache}
+        cp {output.sequences} {params.cache}
+        echo $(seqkit seq -n {output.sequences} | wc -l) BA.2.86 sequences
+        echo $(tail -n +2 {output.metadata} | wc -l) BA.2.86 metadata entries
         """
 
 
