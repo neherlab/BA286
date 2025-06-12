@@ -18,7 +18,7 @@ else:
 
 rule build:
     input:
-        "auspice/BA.2.86.json",
+        "auspice/BA.3.2.json",
 
 
 wildcard_constraints:
@@ -174,8 +174,8 @@ rule unpack_BA286:
         # rm -rf builds/tmp
         cp {output.metadata} {params.cache}
         cp {output.sequences} {params.cache}
-        echo $(seqkit seq -n {output.sequences} | wc -l) BA.2.86 sequences
-        echo $(tail -n +2 {output.metadata} | wc -l) BA.2.86 metadata entries
+        echo $(seqkit seq -n {output.sequences} | wc -l) BA.3.2 sequences
+        echo $(tail -n +2 {output.metadata} | wc -l) BA.3.2 metadata entries
         """
 
 
@@ -446,7 +446,7 @@ rule fix_iqtree:
         python3 scripts/fix_tree.py \
             --alignment {input.alignment} \
             --input-tree {input.tree} \
-            --root "BA.2" \
+            --root "BA.3" \
             --output {output.tree}
         """
 
@@ -525,8 +525,8 @@ rule export:
         colors="builds/colors.tsv",
         description="config/description.md",
     output:
-        auspice_json="builds/BA.2.86.json",
-        root_json="builds/BA.2.86_root-sequence.json",
+        auspice_json="builds/BA.3.2.json",
+        root_json="builds/BA.3.2_root-sequence.json",
     shell:
         """
         augur export v2 \
@@ -544,11 +544,11 @@ rule export:
 
 rule postprocessing:
     input:
-        auspice="builds/BA.2.86.json",
-        root="builds/BA.2.86_root-sequence.json",
+        auspice="builds/BA.3.2.json",
+        root="builds/BA.3.2_root-sequence.json",
     output:
-        auspice="auspice/BA.2.86.json",
-        root="auspice/BA.2.86_root-sequence.json",
+        auspice="auspice/BA.3.2.json",
+        root="auspice/BA.3.2_root-sequence.json",
     shell:
         """
         python3 scripts/postprocess.py
@@ -558,9 +558,9 @@ rule postprocessing:
 
 rule deploy:
     input:
-        "auspice/BA.2.86.json",
-        "auspice/BA.2.86_root-sequence.json",
+        "auspice/BA.3.2.json",
+        "auspice/BA.3.2_root-sequence.json",
     shell:
         """
-        nextstrain remote upload nextstrain.org/groups/neherlab/ncov/BA.2.86 {input} 2>&1
+        nextstrain remote upload nextstrain.org/groups/neherlab/ncov/BA.3.2 {input} 2>&1
         """

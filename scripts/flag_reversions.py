@@ -19,7 +19,7 @@ ref_BA2 = str(SeqIO.read("config/consensus_sequences.fasta", "fasta").seq)
 # print(ref)
 # %%
 # Get .tree from auspice json
-tree=json.load(open("auspice/BA.2.86.json"))["tree"]
+tree=json.load(open("auspice/BA.3.2.json"))["tree"]
 # print(tree)
 # %%
 # Tree is recursive with children under .children
@@ -54,6 +54,6 @@ for node, reversion in reversions:
     print(f"{node}\t{reversion[1:-1]}")
 # %%
 
-print("\nReversions to BA.2")
+print("\nReversions to BA.3")
 for node, reversion in get_reversions(tree["children"], ref_BA2):
     print(f"{node}\t{reversion[1:-1]}")

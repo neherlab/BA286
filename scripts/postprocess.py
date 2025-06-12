@@ -12,8 +12,8 @@ Post-process auspice.json for publication svgs
 import json
 
 #%%
-auspice=json.load(open('builds/BA.2.86.json'))
-modified = json.load(open('builds/BA.2.86.json'))
+auspice=json.load(open('builds/BA.3.2.json'))
+modified = json.load(open('builds/BA.3.2.json'))
 
 #%%
 # Locate node that has C9866T in nuc
@@ -72,7 +72,7 @@ move_to_bottom(['C10507T','C9866T'])
 # prune_child(modified['tree'], child['name'])
 
 
-json.dump(modified, open('auspice/BA.2.86.json', 'w'), indent=2)
+json.dump(modified, open('auspice/BA.3.2.json', 'w'), indent=2)
 # %%
 
 # Now prune
@@ -91,7 +91,7 @@ def prune_children(parent, child_name):
 to_prune = get_node_with_mutation(modified['tree'], 'C897A', max_div=100)
 # print(to_prune)
 prune_children(modified["tree"], to_prune["child"]["name"])
-json.dump(modified, open('auspice/pruned/BA.2.86.json', 'w'), indent=2)
+json.dump(modified, open('auspice/pruned/BA.3.2.json', 'w'), indent=2)
 
 
 

@@ -28,7 +28,7 @@ if __name__ == '__main__':
     #         dates[ri] = [float(x) for x in row['treetime_date'].split(':')]
 
     T = Phylo.read(args.tree, 'newick')
-    T.root_with_outgroup("BA.2")
+    T.root_with_outgroup("BA.3")
     # T.prune(T.find_any("hCoV-19/SouthAfrica/NICD-N55999/2023"))
 
     tt = TreeTime(gtr='JC69', aln =args.alignment, tree=T, dates=dates, verbose=4, use_fft=True)
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         resolve_polytomies=False, assign_gamma=relative_rate, clock_filter=None,
         clock_rate = 0.0005, vary_rate=0.0002, time_marginal='assign')
 
-    tt.tree.prune(tt.tree.find_any("BA.2"))
+    tt.tree.prune(tt.tree.find_any("BA.3"))
 
     if args.output_tree:
         Phylo.write(tt.tree, args.output_tree, 'newick')
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     def branch_labels(x):
         if x==long_branch:
-            return "BA.2.86"
+            return "BA.3.2"
         else:
             return ""
 

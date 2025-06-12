@@ -39,11 +39,11 @@ VARIANT_MAP = {
     "Alpha": df.clade_nextstrain.isin(["20I"]),
     "Delta": df.clade_nextstrain.isin(["21A", "21I", "21J"]),
     "BA.1": df.clade_nextstrain.isin(["21K", "21M"]),
-    "BA.2": df.clade_nextstrain.isin(["21L", "22C"]),
-    "BA.2.75": df.clade_nextstrain.isin(["22D", "23C"]),
+    "BA.3": df.clade_nextstrain.isin(["21L", "22C"]),
+    "BA.3.75": df.clade_nextstrain.isin(["22D", "23C"]),
     "BA.4/5": df.clade_nextstrain.isin(["22A", "22B", "22E"]),
     "XBB": df.Nextclade_pango.str.startswith("XBB"),
-    "BA.2.86": df.Nextclade_pango.str.startswith("B.1.1.529.2.86"),
+    "BA.3.2": df.Nextclade_pango.str.startswith("B.1.1.529.3.2"),
 }
 df["variant"] = "Other"
 for variant, mask in VARIANT_MAP.items():
@@ -87,21 +87,21 @@ COLUMNS=[
     "Alpha",
     "Delta",
     "BA.1",
-    "BA.2",
+    "BA.3",
     "BA.4/5",
-    "BA.2.75",
+    "BA.3.75",
     "XBB",
-    "BA.2.86",
+    "BA.3.2",
     "Other_pct",
     "Beta_pct",
     "Alpha_pct",
     "Delta_pct",
     "BA.1_pct",
-    "BA.2_pct",
+    "BA.3_pct",
     "BA.4/5_pct",
-    "BA.2.75_pct",
+    "BA.3.75_pct",
     "XBB_pct",
-    "BA.2.86_pct",
+    "BA.3.2_pct",
 ]
 # wide.to_csv("results/weekly-variant-counts-south-africa.tsv", sep="\t", columns=COLUMNS)
 # format floats with 2 decimal places
